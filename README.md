@@ -17,3 +17,6 @@ The app continues using the existing localStorage key `lifelog_v1_data` to prese
 
 ## Testing note
 JavaScript syntax validation passed. This is a correction candidate and still requires interactive testing on the user's Android/iPhone browser before production deployment.
+
+
+Version 2.5 adds the Bubu & Dudu (Beach) theme and optional local character animations. The three short MP4 clips are bundled in the assets folder and cached for offline use. Choose the theme and toggle animations in Settings.

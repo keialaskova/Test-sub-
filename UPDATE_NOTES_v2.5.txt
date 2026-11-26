@@ -1,0 +1,10 @@
+LIFELOG v2.5 — Bubu & Dudu Beach Theme
+
+Added:
+- New Bubu & Dudu (Beach) theme in Settings > Appearance.
+- Optional character animations setting in Settings.
+- Short supplied animations on Home, during page changes, and in empty History.
+- Animation clips are bundled locally and precached by the service worker for offline use after the first successful load.
+- Existing LIFELOG data format and local-only storage remain unchanged.
+
+Upload the CONTENTS of the lifelog_v2 folder to the root of your GitHub Pages repository, replacing the previous app files. Keep the assets folder and its three MP4 files. Do not upload the ZIP file itself.

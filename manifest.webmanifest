@@ -1,14 +1,24 @@
 {
-  "name": "LIFELOG — Your personal life recorder",
+  "name": "LIFELOG \u2014 Your personal life recorder",
   "short_name": "LIFELOG",
   "description": "Record everyday moments, activities, and money movements.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f4f5f7",
-  "theme_color": "#f4f5f7",
+  "background_color": "#dff5fb",
+  "theme_color": "#bceeff",
   "icons": [
-    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
