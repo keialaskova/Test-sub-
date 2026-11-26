@@ -23,7 +23,7 @@ body[data-theme="bubu"]{background:linear-gradient(180deg,#bceeff 0,#e8faff 240p
 button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:760px;margin:auto;min-height:100dvh;padding:env(safe-area-inset-top) 14px calc(84px + env(safe-area-inset-bottom))}
 header{display:flex;justify-content:space-between;align-items:center;padding:18px 2px 12px}.brand{font-size:22px;font-weight:850;letter-spacing:.08em}.subbrand{font-size:11px;color:var(--muted)}.iconbtn{border:1px solid var(--line);background:var(--surface);color:var(--text);width:42px;height:42px;border-radius:14px}
 h1{font-size:27px;line-height:1.15;margin:8px 0 4px}h2{font-size:17px;margin:0 0 12px}h3{font-size:15px;margin:0}.muted{color:var(--muted)}.small{font-size:12px}.section{margin:18px 0}.card{background:var(--surface);border:1px solid var(--line);border-radius:19px;padding:15px;box-shadow:var(--shadow)}.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.metric{background:var(--surface2);border-radius:14px;padding:12px 9px}.metric .emoji{font-size:20px}.metric strong{display:block;font-size:20px;margin-top:3px}.metric span{font-size:11px;color:var(--muted)}
-.category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.category{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:17px;padding:14px;text-align:left;min-height:104px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:7px}.category:active,.nav button:active{transform:scale(.98)}.category .emoji{font-size:24px}.category b{font-size:14px}.category small{font-size:11px;color:var(--muted)}
+.category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.category{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:17px;padding:14px;text-align:left;min-height:104px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:7px}.category:active,.nav button:active{transform:scale(.98)}.category .emoji{font-size:24px}.category .character-art{display:block;width:100%;height:86px;object-fit:contain;margin:-2px auto 0;border-radius:12px}.bubu-theme .category{background:linear-gradient(160deg,#fffdf8,#fff0e5)}.bubu-theme .category .character-art{filter:drop-shadow(0 3px 2px rgba(95,65,48,.10))}.category b{font-size:14px}.category small{font-size:11px;color:var(--muted)}
 .sleep-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sleepbtn{background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:14px;text-align:left;color:var(--text);box-shadow:var(--shadow)}.sleepbtn b{display:block;margin:7px 0 2px}.sleepbtn small{color:var(--muted)}
 .nav{position:fixed;z-index:5;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--line);padding:9px 8px calc(9px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(6,1fr);max-width:760px;margin:auto}.nav button{border:0;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;padding:5px 0}.nav button.active{color:var(--text);font-weight:800}.nav .navicon{font-size:19px}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:flex;flex-direction:column;gap:9px}.listitem{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid var(--line)}.listitem:last-child{border:0}.listicon{width:40px;height:40px;border-radius:13px;background:var(--surface2);display:grid;place-items:center;font-size:19px;flex:none}.grow{flex:1;min-width:0}.amount{font-weight:800}.positive{color:var(--green)}.negative{color:var(--red)}
@@ -143,7 +143,8 @@ const DEFAULT_CATEGORIES=[
  {name:"Learning",icon:"📚",desc:"Reading and studying"},
  {name:"Others",icon:"✳️",desc:"Anything else"}
 ];
-const KEY="lifelog_v1_data";
+const KEY="lifelog_v2_6_data";
+if(!localStorage.getItem(KEY)&&localStorage.getItem("lifelog_v1_data")){try{localStorage.setItem(KEY,localStorage.getItem("lifelog_v1_data"));}catch(e){}}
 let data=loadData(), editingId=null, currentKind=null;
 data.memories=data.memories||[];data.reminders=data.reminders||[];
 // Normalize legacy transaction labels so all screens calculate the same money movement.
@@ -180,6 +181,7 @@ function applyTextSize(){const z={small:0.92,medium:1,large:1.10,"extra-large":1
 function saveName(){data.name=document.getElementById("nameInput").value.trim();persist();toast("Name saved");}
 function greeting(){const h=new Date().getHours();return (h<12?"Good morning":h<18?"Good afternoon":"Good evening")+(data.name?", "+data.name:"") +"!";}
 function dateLabel(){return new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"});}
+function categoryArtSlug(name){const n=String(name||"").toLowerCase();if(n.includes("sleep"))return "sleep";if(n.includes("wake"))return "wake-up";if(n.includes("meal"))return "meals";if(n.includes("drink"))return "meals";if(n.includes("travel"))return "travel";if(n.includes("task"))return "daily-tasks";if(n.includes("health")||n.includes("personal care"))return "health";if(n.includes("work"))return "work";if(n.includes("learn")||n.includes("study"))return "reading";if(n.includes("exercise"))return "exercise";if(n.includes("shop"))return "shopping";if(n.includes("rest"))return "rest";if(n.includes("social"))return "rest";return "others";}
 function renderHome(){
  document.getElementById("greeting").textContent=greeting();document.getElementById("todayLabel").textContent=dateLabel();
  const today=new Date().toISOString().slice(0,10), r=data.records.filter(x=>(x.dateTime||"").slice(0,10)===today);
@@ -189,7 +191,7 @@ function renderHome(){
  const wake=r.filter(x=>x.category==="Wake Up").sort((a,b)=>b.dateTime.localeCompare(a.dateTime))[0];
  let dur="—";if(sleep&&wake){let ms=new Date(wake.dateTime)-new Date(sleep.dateTime);if(ms>0)dur=(ms/3600000).toFixed(1)+"h";}
  document.getElementById("sleepMetric").textContent=dur;
- document.body.classList.toggle("bubu-theme",data.theme==="bubu");const decor=document.getElementById("homeBubuDecor");if(decor)decor.classList.toggle("hidden",!(data.theme==="bubu"&&data.animationsEnabled!==false));document.getElementById("categoryGrid").innerHTML=data.categories.filter(c=>c.visible!==false&&!c.archived).map(c=>`<button class="category" style="border-color:${c.color||"var(--line)"}" onclick="openRecord('${esc(c.name)}')"><span class="emoji">${c.icon||"✳️"}</span><b>${esc(c.name)}</b><small>${esc(c.desc||"Tap to record")}</small></button>`).join("");
+ document.body.classList.toggle("bubu-theme",data.theme==="bubu");const decor=document.getElementById("homeBubuDecor");if(decor)decor.classList.toggle("hidden",!(data.theme==="bubu"&&data.animationsEnabled!==false));document.getElementById("categoryGrid").innerHTML=data.categories.filter(c=>c.visible!==false&&!c.archived).map(c=>{const slug=categoryArtSlug(c.name);const art=data.theme==="bubu"?`<img class="character-art" src="assets/characters/${slug}.svg" alt="Bubu and Dudu ${esc(c.name)} illustration" loading="lazy">`: `<span class="emoji">${c.icon||"✳️"}</span>`;return `<button class="category" style="border-color:${c.color||"var(--line)"}" onclick="openRecord('${esc(c.name)}')">${art}<b>${esc(c.name)}</b><small>${esc(c.desc||"Tap to record")}</small></button>`}).join("");
 }
 function field(label,name,type="text",value="",extra=""){return `<div class="field"><label>${label}</label><input name="${name}" type="${type}" value="${esc(value)}" ${extra}></div>`;}
 function selectField(label,name,options,value=""){return `<div class="field"><label>${label}</label><select name="${name}">${options.map(o=>`<option ${o===value?"selected":""}>${esc(o)}</option>`).join("")}</select></div>`;}
@@ -202,10 +204,14 @@ function openRecord(category,id=null){
  else if(category==="Travel"){html+=selectField("Transport","detail",["Motorcycle","Jeepney","Tricycle","Bus","Taxi","Walking","Personal vehicle","Other"],old?.detail||"Motorcycle")+field("Destination (optional)","destination","text",old?.destination||"",'placeholder="Where did you go?"');}
  else if(category==="Daily Tasks"){html+=field("Task","detail","text",old?.detail||"",'required placeholder="What did you do?"')+selectField("Status","status",["Completed","Pending"],old?.status||"Completed");}
  else {html+=field(category==="Activities"?"Activity name":"Description","detail","text",old?.detail||"",'required placeholder="What happened?"')+field("End time (optional)","endTime","datetime-local",old?.endTime||"")+`<div class="field"><label>Notes (optional)</label><textarea name="note">${esc(old?.note||"")}</textarea></div>`;}
- // Require an explicit direction so a received payment is never silently treated as an expense.
- const oldLinked=old?(data.transactions.find(t=>t.id===(old.linkedTransactionId||old.expenseTransactionId))):null;
- const savedType=old?.paymentType||oldLinked?.type||"";
- html+=`<hr><h3>Payment (optional)</h3><div class="field"><label>Transaction type</label><select name="paymentType"><option value="" ${!savedType?"selected":""}>Choose: received or spent</option><option value="out" ${savedType==="out"?"selected":""}>Money spent (Expense)</option><option value="in" ${savedType==="in"?"selected":""}>Money received (Income)</option></select></div>`+field("Amount (optional)","amount","number",old?.amount??"",'min="0.01" step="0.01" placeholder="Leave blank if no transaction"')+selectField("Wallet receiving / paying (required when amount is entered)","wallet",["",...data.wallets],old?.wallet||"");
+ // Payment fields are shown only when the category allows them; the transaction direction is always explicit.
+ const categoryConfig=data.categories.find(c=>c.name===category);
+ const paymentAllowed=!categoryConfig||categoryConfig.paymentEnabled!==false;
+ if(paymentAllowed){
+  const oldLinked=old?(data.transactions.find(t=>t.id===(old.linkedTransactionId||old.expenseTransactionId))):null;
+  const savedType=old?.paymentType||oldLinked?.type||"";
+  html+=`<hr><h3>Payment (optional)</h3><div class="field"><label>Transaction type</label><select name="paymentType"><option value="" ${!savedType?"selected":""}>Choose: received or spent</option><option value="out" ${savedType==="out"?"selected":""}>Money spent (Expense)</option><option value="in" ${savedType==="in"?"selected":""}>Money received (Income)</option></select></div>`+field("Amount (optional)","amount","number",old?.amount??"",'min="0.01" step="0.01" placeholder="Leave blank if no transaction"')+selectField("Wallet receiving / paying (required when amount is entered)","wallet",["",...data.wallets],old?.wallet||"");
+ }
  document.getElementById("modalFields").innerHTML=html;document.getElementById("recordForm").onsubmit=saveRecord;document.getElementById("modalBack").classList.add("show");
 }
 function closeModal(){document.getElementById("modalBack").classList.remove("show");editingId=null;}
@@ -214,7 +220,7 @@ function saveRecord(e){
  e.preventDefault();
  const f=new FormData(e.target), old=editingId?data.records.find(x=>x.id===editingId):null;
  const linkedId=old?.linkedTransactionId||old?.expenseTransactionId||null;
- const amountValue=f.get("amount")?Number(f.get("amount")):null;
+ const categoryConfig=data.categories.find(c=>c.name===currentKind);const paymentAllowed=!categoryConfig||categoryConfig.paymentEnabled!==false;const amountValue=paymentAllowed&&f.get("amount")?Number(f.get("amount")):null;
  if(amountValue>0 && !f.get("paymentType")){toast("Choose whether this is money received or spent");return;}
  if(amountValue>0 && !f.get("wallet")){toast("Choose the wallet for this payment so its balance and reports can update");return;}
  const obj={id:editingId||makeId(),category:currentKind,dateTime:f.get("dateTime"),detail:f.get("detail")||"",mealType:f.get("mealType")||old?.mealType||"",mealDescription:currentKind==="Meals & Drinks"?(f.get("detail")||""):"",amount:amountValue,wallet:f.get("wallet")||"",paymentType:f.get("paymentType")||"",destination:f.get("destination")||"",status:f.get("status")||"",endTime:f.get("endTime")||"",note:f.get("note")||"",linkedTransactionId:linkedId};
@@ -235,7 +241,7 @@ function saveRecord(e){
  if(editingId){data.records=data.records.map(x=>x.id===editingId?obj:x);}else{data.records.push(obj);}
  closeModal();persist();toast("Record saved");
 }
-function balances(){const b={};data.wallets.forEach(w=>b[w]=Number((data.walletOpening||{})[w]||0));data.transactions.forEach(t=>{if(t.type==="in")b[t.wallet]=(b[t.wallet]||0)+t.amount;if(t.type==="out")b[t.wallet]=(b[t.wallet]||0)-t.amount;if(t.type==="transfer"){b[t.from]=(b[t.from]||0)-t.amount;b[t.to]=(b[t.to]||0)+t.amount;}});return b;}
+function balances(){const b={};data.wallets.forEach(w=>b[w]=0);data.transactions.forEach(t=>{if(t.type==="in")b[t.wallet]=(b[t.wallet]||0)+t.amount;if(t.type==="out")b[t.wallet]=(b[t.wallet]||0)-t.amount;if(t.type==="transfer"){b[t.from]=(b[t.from]||0)-t.amount;b[t.to]=(b[t.to]||0)+t.amount;}});return b;}
 function openMoney(type){currentKind="money";editingId=null;const wallets=data.wallets;let html=field("Date & time","dateTime","datetime-local",nowLocal(),"required")+field("Amount","amount","number","","required min=\"0.01\" step=\"0.01\"");
  if(type==="transfer"){html+=selectField("From wallet","from",wallets,wallets[0])+selectField("To wallet","to",wallets,wallets[1]||wallets[0]);}else{html+=selectField("Wallet", "wallet",wallets,wallets[0]);}
  html+=`<div class="field"><label>Note (optional)</label><input name="note" placeholder="Add a note"></div>`;
@@ -243,7 +249,7 @@ function openMoney(type){currentKind="money";editingId=null;const wallets=data.w
  document.getElementById("modalFields").innerHTML=html;document.getElementById("recordForm").onsubmit=(e)=>saveMoney(e,type);document.getElementById("modalBack").classList.add("show");
 }
 function saveMoney(e,type){e.preventDefault();const f=new FormData(e.target);const t={id:crypto.randomUUID(),type,amount:Number(f.get("amount")),dateTime:f.get("dateTime"),wallet:f.get("wallet")||"",from:f.get("from")||"",to:f.get("to")||"",note:f.get("note")||""};if(type==="transfer"&&t.from===t.to){toast("Choose two different wallets");return;}data.transactions.push(t);closeModal();document.getElementById("recordForm").onsubmit=saveRecord;persist();toast("Transaction saved");}
-function addWallet(){const n=prompt("Name your new wallet (e.g. Maya):");if(n&&n.trim()&&!data.wallets.includes(n.trim())){data.wallets.push(n.trim());data.walletOpening=data.walletOpening||{};const opening=prompt("Opening balance for "+n.trim()+" (enter 0 if none):","0");data.walletOpening[n.trim()]=Math.max(0,Number(opening)||0);persist();toast("Wallet added");}}
+function addWallet(){const n=prompt("Name your new wallet (e.g. Maya):");if(n&&n.trim()&&!data.wallets.includes(n.trim())){data.wallets.push(n.trim());persist();toast("Wallet added. Record money received or spent to update its balance.");}}
 function renderMoney(){const b=balances(),total=Object.values(b).reduce((a,x)=>a+x,0),ins=data.transactions.filter(x=>x.type==="in").reduce((a,x)=>a+x.amount,0),outs=data.transactions.filter(x=>x.type==="out").reduce((a,x)=>a+x.amount,0);document.getElementById("totalBalance").textContent=money(total);document.getElementById("incomeTotal").textContent="Income "+money(ins);document.getElementById("expenseTotal").textContent="Expenses "+money(outs);
  document.getElementById("walletGrid").innerHTML=data.wallets.map(w=>`<div class="wallet"><span class="muted small">◈ ${esc(w)}</span><strong>${money(b[w]||0)}</strong></div>`).join("");
  const tx=[...data.transactions].sort((a,b)=>b.dateTime.localeCompare(a.dateTime));document.getElementById("recentMoney").innerHTML=tx.length?tx.map(t=>`<div class="listitem"><div class="listicon">💸</div><div class="grow"><b>${t.sourceRecordId?esc(t.note):t.type==="in"?"Cash In":t.type==="out"?"Cash Out":"Transfer"}</b><div class="muted small">${esc(t.dateTime.replace("T"," "))} · ${esc(t.wallet||t.from+" → "+t.to)}</div></div><b class="${t.type==="in"?"positive":t.type==="out"?"negative":""}">${t.type==="in"?"+":t.type==="out"?"−":""}${money(t.amount)}</b></div>`).join(""):'<div class="empty">No transactions yet.</div>';

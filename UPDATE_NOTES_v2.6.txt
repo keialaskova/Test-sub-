@@ -1,0 +1,14 @@
+LIFELOG v2.6 — Bubu & Dudu Theme Integration Test
+
+Based on the v2.6 test project uploaded by the user.
+
+Updates in this build:
+- Bubu & Dudu theme now displays individual category illustrations on the Home category cards.
+- Illustrations are separate transparent SVG files in assets/characters.
+- Other themes (Light, Dark, Original) continue to use their existing emoji category icons.
+- Existing Bubu & Dudu beach animations are preserved.
+- Service worker cache version bumped and character artwork added to precache.
+
+Important: This is an initial theme integration test. Outfit selection controls and character art on every secondary screen are not included yet.
+
+Before replacing the live app, export a LIFELOG backup from Settings. Upload the contents of this folder to the repository root, including the assets/characters folder and the existing MP4 assets.
