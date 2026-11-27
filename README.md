@@ -1,22 +1,23 @@
-# LIFELOG v2.0 – Money, History & Reports correction build
+# LIFELOG v2.7 — Bubu & Dudu Character Theme Test
 
-This build focuses on consistent category-linked money transactions across Money, Life History, and Reports.
+This build is based on the uploaded LIFELOG v2.5 project.
 
-## Changes
-- Category payment creates one linked income or expense transaction when amount and wallet are supplied.
-- Editing a category record updates its existing linked transaction rather than creating a duplicate.
-- Clearing the payment removes its linked transaction.
-- Deleting an activity removes its linked transaction.
-- Wallet balances are calculated only from recorded transactions; no opening balance is requested or applied.
-- Money shows the complete transaction list, including category-linked payments.
-- Life History shows category-linked payments on their activity row (avoiding duplicate history rows) and shows standalone Cash In, Cash Out, and transfers separately.
-- Reports include Daily, Weekly, Monthly, and All-time periods, with received, spent, net movement, and per-wallet totals.
+## What's changed
+- Reworked the Bubu & Dudu theme from repeated thumbnail decorations into distinct category scene illustrations.
+- Added separate SVG scene assets for Sleep, Wake Up, Meals, Drinks, Work, Study, Exercise, Tasks, Money, Shopping, Health, Travel, Rest, Social Life and Other.
+- Added matching Bubu & Dudu scene art to the Sleep/Wake Up quick-record cards and record form header.
+- Added a Bubu & Dudu outfit-choice panel in Settings, visible while the Bubu & Dudu theme is active.
+- Preserved the existing Bubu beach videos, data model, navigation, and the Light, Dark and Original themes.
+- Bumped the service worker cache name and precached the new illustration files.
 
-## Data
-The app continues using the existing localStorage key `lifelog_v1_data` to preserve compatibility with the earlier LIFELOG build. Export a JSON backup before replacing a live deployment. Data remains local to each browser/device; this build does not add cloud sync.
+## Test steps
+1. Back up your current LIFELOG data from Settings > Backup & restore.
+2. Extract this ZIP.
+3. Upload the contents of `lifelog_v2` to the root of your GitHub Pages repository, replacing the previous app files.
+4. Open the app and choose Settings > Appearance > Bubu & Dudu (Character Theme).
+5. Check Home category cards and open a category to see its matching illustration.
 
-## Testing note
-JavaScript syntax validation passed. This is a correction candidate and still requires interactive testing on the user's Android/iPhone browser before production deployment.
-
-
-Version 2.5 adds the Bubu & Dudu (Beach) theme and optional local character animations. The three short MP4 clips are bundled in the assets folder and cached for offline use. Choose the theme and toggle animations in Settings.
+## Notes
+- The character scenes are original SVG recreations based on the references supplied in the conversation; they are not official source artwork.
+- Outfit choices currently save a theme preference and display outfit previews in Settings. They do not yet dynamically restyle every activity illustration.
+- This is a test build. Keep the previous ZIP and export a data backup before replacing files.
