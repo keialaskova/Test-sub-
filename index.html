@@ -49,6 +49,18 @@ body[data-theme="bubu"]{background:linear-gradient(180deg,#c9f1ff 0,#eafaff 220p
 .bubu-outfit-option img{width:100%;height:72px;object-fit:contain;display:block}
 .bubu-outfit-option.selected{outline:2px solid #d58b79;background:#fff0e8}
 
+
+.bubu-outfit-tabs{display:flex;gap:7px;margin:8px 0;flex-wrap:wrap}
+.bubu-outfit-tabs button.selected{background:#f8d8ce;border-color:#d58b79;color:#54372d}
+.bubu-outfit-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+.bubu-outfit-option img{height:100px;object-fit:contain;background:#fff8f2;border-radius:10px}
+.bubu-theme .category .character-art{height:118px;object-fit:contain}
+
+.bubu-selected-outfit{display:none;align-items:center;gap:8px;padding:10px;margin:10px 0;background:#fffaf3;border:1px solid #f0d6c7;border-radius:18px}
+.bubu-selected-outfit.visible{display:flex}
+.bubu-selected-outfit img{width:54px;height:58px;object-fit:contain}
+.bubu-selected-outfit div{flex:1;min-width:0;color:#654538}
+.bubu-selected-outfit small{display:block;font-size:10px;color:#987d70}
 </style>
 </head>
 <body data-theme="light">
@@ -59,14 +71,15 @@ body[data-theme="bubu"]{background:linear-gradient(180deg,#c9f1ff 0,#eafaff 220p
 <section id="page-home" class="page active">
   <div class="row"><div><h1 id="greeting">Welcome!</h1><div class="muted small" id="todayLabel"></div></div><span class="pill">Today</span></div>
   <div class="bubu-decor" id="homeBubuDecor"><video muted autoplay loop playsinline preload="metadata"><source src="assets/bubu-home.mp4" type="video/mp4"></video><div class="decor-copy">A little sunshine for your day ☀️<div class="muted small" style="font-weight:500">Make every little moment count.</div></div></div>
+  <div class="bubu-selected-outfit" id="bubuSelectedOutfit"></div>
   <div class="section card"><h2>Today at a glance</h2><div class="summary-grid">
     <div class="metric"><div class="emoji">🌙</div><strong id="sleepMetric">—</strong><span>Sleep</span></div>
     <div class="metric"><div class="emoji">🍽️</div><strong id="mealMetric">0</strong><span>Meals</span></div>
     <div class="metric"><div class="emoji">✨</div><strong id="activityMetric">0</strong><span>Activities</span></div>
   </div></div>
   <div class="section"><h2>Sleep & Rest</h2><div class="sleep-grid">
-    <button class="sleepbtn" onclick="openRecord('Sleep')"><img src="assets/characters/sleep.svg" alt="Bubu and Dudu sleeping"><span class="emoji">🌙</span><b>Sleep</b><small>Record bedtime</small></button>
-    <button class="sleepbtn" onclick="openRecord('Wake Up')"><img src="assets/characters/wake.svg" alt="Bubu and Dudu waking up"><span class="emoji">🌅</span><b>Wake Up</b><small>Record waking time</small></button>
+    <button class="sleepbtn" onclick="openRecord('Sleep')"><img src="assets/bubu-dudu/categories/bubu/sleep.png" alt="Bubu and Dudu sleeping"><span class="emoji">🌙</span><b>Sleep</b><small>Record bedtime</small></button>
+    <button class="sleepbtn" onclick="openRecord('Wake Up')"><img src="assets/bubu-dudu/categories/dudu/wake_up.png" alt="Bubu and Dudu waking up"><span class="emoji">🌅</span><b>Wake Up</b><small>Record waking time</small></button>
   </div></div>
   <div class="section"><h2>Daily Life Categories</h2><div class="category-grid" id="categoryGrid"></div></div>
 </section>
@@ -199,16 +212,44 @@ function saveName(){data.name=document.getElementById("nameInput").value.trim();
 function greeting(){const h=new Date().getHours();return (h<12?"Good morning":h<18?"Good afternoon":"Good evening")+(data.name?", "+data.name:"") +"!";}
 function dateLabel(){return new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"});}
 
-const BUBU_ART={"Sleep":"sleep","Wake Up":"wake","Meals & Drinks":"meal","Travel":"travel","Activities":"social","Daily Tasks":"task","Health & Personal Care":"health","Social Life":"social","Working":"work","Learning":"study","Others":"other","Finance":"money","Shopping":"shopping","Rest":"rest","Drink":"drink"};
-function artKey(category){return BUBU_ART[category]||"other";}
-function artPath(category){return "assets/characters/"+artKey(category)+".svg";}
+
+const BUBU_ART={
+ "Sleep":["bubu","sleep"],"Wake Up":["dudu","wake_up"],
+ "Meals & Drinks":["bubu","meals"],"Travel":["dudu","travel"],
+ "Activities":["together","social"],"Daily Tasks":["bubu","daily_task"],
+ "Health & Personal Care":["dudu","health"],"Social Life":["together","social"],
+ "Working":["bubu","work_study"],"Learning":["bubu","learning"],
+ "Others":["together","others"],"Finance":["dudu","finance"],
+ "Shopping":["bubu","shopping"],"Rest":["together","relax"],
+ "Drink":["dudu","meals"],"Exercise":["dudu","exercise"],
+ "Hygiene":["bubu","hygiene"],"Medication":["dudu","medication"]
+};
+function artPath(category){
+ const [who,key]=BUBU_ART[category]||["together","others"];
+ return `assets/bubu-dudu/categories/${who}/${key}.png`;
+}
+let outfitGroup="bubu";
+const OUTFIT_LABELS={beach:"Beach",bunny:"Bunny",casual:"Casual",chef:"Chef",default:"Classic",dinosaur:"Dinosaur",doctor:"Doctor",explorer:"Explorer",formal:"Formal",kimono:"Kimono",pajamas:"Pajamas",raincoat:"Raincoat",school:"School",sport:"Sport",student:"Student",travel:"Travel",winter:"Winter",work:"Work"};
 function renderBubuOutfits(){
  const host=document.getElementById("bubuOutfitChoices");if(!host)return;
- const outfits=[["casual","Casual"],["school","School"],["chef","Chef"],["travel","Traveler"],["sport","Athletic"],["sleep","Sleepwear"],["hoodie","Hoodie"]];
- const chosen=data.bubuOutfit||"casual";
- host.innerHTML=outfits.map(([key,label])=>`<button class="bubu-outfit-option ${chosen===key?"selected":""}" onclick="chooseBubuOutfit('${key}')"><img src="assets/characters/outfit-${key}.svg" alt=""><b>${label}</b></button>`).join("");
+ const groups=["bubu","dudu","together"];
+ const groupLabels={bubu:"Bubu",dudu:"Dudu",together:"Together"};
+ const keyProp={bubu:"bubuOutfit",dudu:"duduOutfit",together:"coupleOutfit"}[outfitGroup];
+ const chosen=data[keyProp]||"casual";
+ const files=Object.keys(OUTFIT_LABELS);
+ host.innerHTML=`<div class="bubu-outfit-tabs">${groups.map(g=>`<button class="secondary ${outfitGroup===g?"selected":""}" onclick="setOutfitGroup('${g}')">${groupLabels[g]}</button>`).join("")}</div><div class="bubu-outfit-grid">${files.map(k=>`<button class="bubu-outfit-option ${chosen===k?"selected":""}" onclick="chooseBubuOutfit('${k}')"><img loading="lazy" src="assets/bubu-dudu/attire/${outfitGroup}/${k}.png" alt="${groupLabels[outfitGroup]} ${OUTFIT_LABELS[k]} outfit"><b>${OUTFIT_LABELS[k]}</b></button>`).join("")}</div>`;
+ const preview=document.getElementById("bubuSelectedOutfit");
+ if(preview){
+   const b=data.bubuOutfit||"casual", d=data.duduOutfit||"casual", c=data.coupleOutfit||"casual";
+   preview.innerHTML=`<img src="assets/bubu-dudu/attire/bubu/${b}.png" alt="Bubu outfit"><img src="assets/bubu-dudu/attire/dudu/${d}.png" alt="Dudu outfit"><div><b>Your Bubu & Dudu looks</b><small>Bubu: ${OUTFIT_LABELS[b]||b} · Dudu: ${OUTFIT_LABELS[d]||d}</small></div><img src="assets/bubu-dudu/attire/together/${c}.png" alt="Matching couple outfit">`;
+   preview.classList.toggle("visible",data.theme==="bubu");
+ }
 }
-function chooseBubuOutfit(v){data.bubuOutfit=v;localStorage.setItem(KEY,JSON.stringify(data));renderBubuOutfits();toast("Outfit preference saved");}
+function setOutfitGroup(g){outfitGroup=g;renderBubuOutfits();}
+function chooseBubuOutfit(v){
+ const keyProp={bubu:"bubuOutfit",dudu:"duduOutfit",together:"coupleOutfit"}[outfitGroup];
+ data[keyProp]=v;localStorage.setItem(KEY,JSON.stringify(data));renderBubuOutfits();toast("Outfit choice saved");
+}
 
 function renderHome(){
  document.getElementById("greeting").textContent=greeting();document.getElementById("todayLabel").textContent=dateLabel();
